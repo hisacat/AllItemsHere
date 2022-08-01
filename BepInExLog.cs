@@ -24,5 +24,13 @@ namespace RF5.HisaCat.AllItemsHere
         {
             BepInExLoader.log.LogError($"[{BepInExLoader.GUID}] {obj.ToString()}");
         }
+        public static void LogWarning(string msg)
+        {
+            BepInExLoader.log.LogWarning($"[{BepInExLoader.GUID}] {msg}");
+        }
+        public static void LogWarning(object obj)
+        {
+            BepInExLoader.log.LogWarning($"[{BepInExLoader.GUID}] {obj.ToString()}");
+        }
     }
 }

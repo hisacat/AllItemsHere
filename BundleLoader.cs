@@ -28,9 +28,9 @@ namespace RF5.HisaCat.AllItemsHere
                 return false;
             }
 
-            var mainBundle = AssetBundle.LoadFromFile(mainBundlePath);
+            MainBundle = AssetBundle.LoadFromFile(mainBundlePath);
 
-            if (mainBundle == null)
+            if (MainBundle == null)
             {
                 BepInExLog.LogError($"BundleLoader: Cannot load bundle at \"{mainBundlePath}\"");
                 return false;

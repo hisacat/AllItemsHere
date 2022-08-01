@@ -33,6 +33,8 @@ namespace RF5.HisaCat.AllItemsHere
                 ClassInjector.RegisterTypeInIl2Cpp<Utils.CoroutineExtension.Wrapper>();
                 ClassInjector.RegisterTypeInIl2Cpp<Components.CoroutineAction>();
                 ClassInjector.RegisterTypeInIl2Cpp<Components.AllItemsHereWindow>();
+                ClassInjector.RegisterTypeInIl2Cpp<Components.SimpleButtonLinker>();
+                ClassInjector.RegisterTypeInIl2Cpp<Components.GetItemButtonWork>();
             }
             catch (System.Exception e)
             {
@@ -45,6 +47,7 @@ namespace RF5.HisaCat.AllItemsHere
                 Harmony.CreateAndPatchAll(typeof(Components.CoroutineActionPatcher));
                 Harmony.CreateAndPatchAll(typeof(Utils.RF5FontHelper.FontLoader));
                 Harmony.CreateAndPatchAll(typeof(Patches.ModInitializePatch));
+                Harmony.CreateAndPatchAll(typeof(Patches.WindowAttachPatch));
             }
             catch (System.Exception e)
             {
