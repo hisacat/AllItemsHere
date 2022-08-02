@@ -44,12 +44,12 @@ namespace RF5.HisaCat.AllItemsHere.Components
 
         private void CacheCampMenuMain()
         {
-            if(campMenuMain != null)
+            if (campMenuMain != null)
             {
                 if (this.transform.IsChildOf(campMenuMain.transform) == false)
                     campMenuMain = null;
             }
-            if(campMenuMain == null)
+            if (campMenuMain == null)
             {
                 campMenuMain = this.GetComponentInParent<CampMenuMain>();
             }
@@ -113,44 +113,89 @@ namespace RF5.HisaCat.AllItemsHere.Components
 
             CacheCampMenuMain();
 
-            List<List<GameObject>> itemButtons = new List<List<GameObject>>();
-            GameObject curOneLineObj = null;
-            int curAddedCount = 0;
-            int curX = -1;
-            int curY = -1;
-            foreach (ItemID itemId in typeof(ItemID).GetEnumValues())
+            var buttonLinkersMap = new Dictionary<Vector2Int, ButtonLinker>();
             {
-                if (CheckIsValidItemId(itemId) == false)
-                    continue;
-
-                if (curAddedCount >= 10) break;
-
-                var dataTable = ItemDataTable.GetDataTable(itemId);
-
-                var curOneLineCount = curAddedCount % ONE_LINE_COUNT;
-                if (curOneLineCount == 0)
+                GameObject curOneLineObj = null;
+                int curAddedCount = 0;
+                var curXY = new Vector2Int(-1, -1);
+                foreach (ItemID itemId in typeof(ItemID).GetEnumValues())
                 {
-                    curOneLineObj = Instantiate(this.Prefab_ItemsSlot_OneLine, this.ItemContentsArea.transform);
-                    curOneLineObj.DestroyAllChildren();
-                    curX = 0; curY++;
+                    if (CheckIsValidItemId(itemId) == false)
+                        continue;
+
+                    if (curAddedCount >= 10) break;
+
+                    var dataTable = ItemDataTable.GetDataTable(itemId);
+
+                    var curOneLineCount = curAddedCount % ONE_LINE_COUNT;
+                    if (curOneLineCount == 0)
+                    {
+                        curOneLineObj = Instantiate(this.Prefab_ItemsSlot_OneLine, this.ItemContentsArea.transform);
+                        curOneLineObj.DestroyAllChildren();
+                        curXY.x = 0; curXY.y++;
+                    }
+
+                    var curItemSlot = Instantiate(this.Prefab_ItemsSlot, curOneLineObj.transform);
+                    curItemSlot.name = $"{this.Prefab_ItemsSlot} {curAddedCount}";
+                    var itemIconLoader = curItemSlot.AddComponent<ItemIconLoader>();
+                    itemIconLoader.Image = curItemSlot.transform.Find("Image_Item").GetComponent<Image>();
+                    itemIconLoader.SetLoadIcon(itemId);
+
+                    var buttonLinker = curItemSlot.AddComponent<ButtonLinker>();
+                    buttonLinker.TouchSelector = true; //Enable- touch
+                    buttonLinkersMap.Add(curXY, buttonLinker);
+                    //Note: ButtonLinker's Touch event seems like working based on InputCursor.
+                    //And if each ButtonLinkers rect overlaps on touch point, the InputCursor trying focus on 'all the corresponding objects'.
+
+                    buttonLinker.SubmitOnTouch = true;
+                    var buttonWork = curItemSlot.AddComponent<GetItemButtonWork>();
+                    buttonLinker.ButtonWork = buttonWork;
+                    buttonWork.CursorLinker = buttonLinker;
+
+                    curXY.x++;
+                    curAddedCount++;
+                }
+            }
+            //Add link to each buttonLinkers
+            {
+                var curXY = Vector2Int.zero;
+                while (true)
+                {
+                    if (buttonLinkersMap.ContainsKey(curXY) == false)
+                        break;
+                    var curLinker = buttonLinkersMap[curXY];
+
+                    var leftXY = new Vector2Int(curXY.x - 1, curXY.y);
+                    var rightXY = new Vector2Int(curXY.x + 1, curXY.y);
+                    var upXY = new Vector2Int(curXY.x, curXY.y + 1);
+                    var downXY = new Vector2Int(curXY.x, curXY.y - 1);
+
+                    if (buttonLinkersMap.ContainsKey(leftXY))
+                        curLinker.AddLink(CursorLinker.InputMoveType.Left, buttonLinkersMap[leftXY].gameObject);
+                    if (buttonLinkersMap.ContainsKey(rightXY))
+                        curLinker.AddLink(CursorLinker.InputMoveType.Right, buttonLinkersMap[rightXY].gameObject);
+                    if (buttonLinkersMap.ContainsKey(upXY))
+                        curLinker.AddLink(CursorLinker.InputMoveType.Up, buttonLinkersMap[upXY].gameObject);
+                    if (buttonLinkersMap.ContainsKey(downXY))
+                        curLinker.AddLink(CursorLinker.InputMoveType.Down, buttonLinkersMap[downXY].gameObject);
+
+                    curXY.x++;
+                    if (curXY.x >= ONE_LINE_COUNT)
+                        curXY.y++;
                 }
 
-                var curItemSlot = Instantiate(this.Prefab_ItemsSlot, curOneLineObj.transform);
-                curItemSlot.name = $"{this.Prefab_ItemsSlot} {curAddedCount}";
-                var itemIconLoader = curItemSlot.AddComponent<ItemIconLoader>();
-                itemIconLoader.Image = curItemSlot.transform.Find("Image_Item").GetComponent<Image>();
-                itemIconLoader.SetLoadIcon(itemId);
-
-                var buttonLinker = curItemSlot.AddComponent<ButtonLinker>();
-                //Enable- touch
-                buttonLinker.TouchSelector = true;
-
-                curX++;
-                curAddedCount++;
+                //Linkers for escape
+                var rightEdgeLinkers = buttonLinkersMap.Where(x => x.Key.y >= ONE_LINE_COUNT).Select(x => x.Value);
+                foreach(var linker in rightEdgeLinkers)
+                {
+                    //TODO: Add escape link.
+                    //linker.AddLink(CursorLinker.InputMoveType.Right, null);
+                }
             }
 
             return true;
         }
+
         public bool CheckIsValidItemId(ItemID itemId)
         {
             if (itemId == ItemID.ITEM_EMPTY)
@@ -232,7 +277,7 @@ namespace RF5.HisaCat.AllItemsHere.Components
                 return false;
             }
 
-            if(Instance.InitUI() == false)
+            if (Instance.InitUI() == false)
             {
                 BepInExLog.LogError("InstantiateAndAttach: Failed to InitUI!");
                 Destroy(windowInstance);
