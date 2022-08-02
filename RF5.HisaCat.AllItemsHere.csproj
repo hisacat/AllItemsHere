@@ -108,6 +108,7 @@
     <Compile Include="Components\AllItemsHereWindow.cs" />
     <Compile Include="Components\CoroutineAction.cs" />
     <Compile Include="Components\GetItemButtonWork.cs" />
+    <Compile Include="Components\ItemInfoScrollBox.cs" />
     <Compile Include="Extensions\UnityExtension.cs" />
     <Compile Include="Patches\CampMenuPatch.cs" />
     <Compile Include="Patches\ModInitializePatch.cs" />
@@ -117,9 +118,14 @@
     <Compile Include="Utils\InputHelper.cs" />
     <Compile Include="Utils\RF5FontHelper.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="%40AssetBundle\allitemshere.main.unity3d">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetDir)RF5.HisaCat.AllItemsHere.dll" "C:\Program Files (x86)\Steam\steamapps\common\Rune Factory 5\BepInEx\plugins"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetDir)RF5.HisaCat.AllItemsHere.dll" "C:\Program Files (x86)\Steam\steamapps\common\Rune Factory 5\BepInEx\plugins"
+copy "$(TargetDir)\@AssetBundle\allitemshere.main.unity3d" "C:\Program Files (x86)\Steam\steamapps\common\Rune Factory 5\BepInEx\plugins\RF5.HisaCat.AllItemsHere"</PostBuildEvent>
   </PropertyGroup>
 </Project>
