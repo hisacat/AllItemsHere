@@ -108,8 +108,8 @@
     <Compile Include="Components\AllItemsHereWindow.cs" />
     <Compile Include="Components\CoroutineAction.cs" />
     <Compile Include="Components\GetItemButtonWork.cs" />
-    <Compile Include="Components\SimpleButtonLinker.cs" />
     <Compile Include="Extensions\UnityExtension.cs" />
+    <Compile Include="Patches\CampMenuPatch.cs" />
     <Compile Include="Patches\ModInitializePatch.cs" />
     <Compile Include="Patches\WindowAttachPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

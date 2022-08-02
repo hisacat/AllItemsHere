@@ -12,7 +12,6 @@ namespace RF5.HisaCat.AllItemsHere.Components
         public override void ButtonWork(Key btnType)
         {
             BepInExLog.Log($"{name} ButtonWork {btnType}");
-            //...
         }
         public override void EndFocus()
         {

@@ -33,7 +33,6 @@ namespace RF5.HisaCat.AllItemsHere
                 ClassInjector.RegisterTypeInIl2Cpp<Utils.CoroutineExtension.Wrapper>();
                 ClassInjector.RegisterTypeInIl2Cpp<Components.CoroutineAction>();
                 ClassInjector.RegisterTypeInIl2Cpp<Components.AllItemsHereWindow>();
-                ClassInjector.RegisterTypeInIl2Cpp<Components.SimpleButtonLinker>();
                 ClassInjector.RegisterTypeInIl2Cpp<Components.GetItemButtonWork>();
             }
             catch (System.Exception e)

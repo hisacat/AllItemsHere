@@ -7,33 +7,84 @@ using UnityEngine;
 using UnityEngine.UI;
 using RF5.HisaCat.AllItemsHere.Utils;
 using RF5.HisaCat.AllItemsHere.Extensions;
+using RF5.HisaCat.AllItemsHere.Patches;
 
 namespace RF5.HisaCat.AllItemsHere.Components
 {
     internal class AllItemsHereWindow : MonoBehaviour
     {
         public static AllItemsHereWindow Instance { get; private set; }
-        //MainWindowCanvas
         public AllItemsHereWindow(System.IntPtr pointer) : base(pointer) { }
 
         private GameObject ItemContentsArea = null;
         private GameObject Prefab_ItemsSlot_OneLine = null;
         private GameObject Prefab_ItemsSlot = null;
 
-        public void Update()
+        private CampMenuMain campMenuMain = null;
+        private void Awake()
         {
-            //There are 2 cursors in camp UI
+            CacheCampMenuMain();
+        }
+        private void Start()
+        {
+            CacheCampMenuMain();
+        }
+        private void OnEnable()
+        {
+            CampMenuPatch.onPageOpened += CampMenuPatch_onPageOpened;
+        }
+        private void OnDisable()
+        {
+            CampMenuPatch.onPageOpened -= CampMenuPatch_onPageOpened;
+        }
+        private void CampMenuPatch_onPageOpened(CampPage page)
+        {
+            BepInExLog.Log($"Page opened {page}");
+        }
 
-            //if (InputHelper.GetKeyDown(RF5Input.Key.CK3))
-            if (InputHelper.GetKeyDown(BepInEx.IL2CPP.UnityEngine.KeyCode.Alpha1))
+        private void CacheCampMenuMain()
+        {
+            if(campMenuMain != null)
             {
-                CursorController.NowCursor.SetFocus(linkers[0]);
-
-                //OnPointerClick ?
+                if (this.transform.IsChildOf(campMenuMain.transform) == false)
+                    campMenuMain = null;
+            }
+            if(campMenuMain == null)
+            {
+                campMenuMain = this.GetComponentInParent<CampMenuMain>();
             }
         }
 
-        List<SimpleButtonLinker> linkers = new List<SimpleButtonLinker>();
+        private void Update()
+        {
+            //There are 2 cursors in camp UI
+            // "/StartUI/UIMainManager/UIMainCanvas(Clone)/MainWindowCanvas/UIObjectLoader/HeadObject/Cursor"
+            // "/StartUI/UIMainManager/UIMainCanvas(Clone)/MainWindowCanvas/CampUI/Cursor"
+
+            //카테고리 텍스트
+            // "/StartUI/UIMainManager/UIMainCanvas(Clone)/MainWindowCanvas/CampUI/CampMenuObject/CenterMenu/RuckItemMenu/EquipItemGroup/ItemBoxWindow/SortDisp/ruck_sortbtn"
+            //중앙 화면
+            // "/StartUI/UIMainManager/UIMainCanvas(Clone)/MainWindowCanvas/CampUI/CampMenuObject/CenterMenu"
+            //좌측 플레이어 화면
+            // "/StartUI/UIMainManager/UIMainCanvas(Clone)/MainWindowCanvas/CampUI/CampMenuObject/CenterMenu/PlayerEquipMenu"
+            //우측 인벤토리 화면
+            // "/StartUI/UIMainManager/UIMainCanvas(Clone)/MainWindowCanvas/CampUI/CampMenuObject/CenterMenu/RuckItemMenu"
+
+            //윈도우 생성은 "/StartUI/UIMainManager/UIMainCanvas(Clone)/MainWindowCanvas"에서?
+            //Sbling은 우측 인벤토리 화면 위에 두도록 한다.
+
+            #region Test logic
+            if (InputHelper.GetKey(BepInEx.IL2CPP.UnityEngine.KeyCode.Home))
+                this.transform.Translate(new Vector3(10, 0, 0));
+            if (InputHelper.GetKey(BepInEx.IL2CPP.UnityEngine.KeyCode.End))
+                this.transform.Translate(new Vector3(-10, 0, 0));
+            if (InputHelper.GetKeyDown(BepInEx.IL2CPP.UnityEngine.KeyCode.Alpha1))
+            {
+                //Test
+            }
+            #endregion
+        }
+
         private const int ONE_LINE_COUNT = 5;
         private bool InitUI()
         {
@@ -60,6 +111,8 @@ namespace RF5.HisaCat.AllItemsHere.Components
 
             this.ItemContentsArea.DestroyAllChildren();
 
+            CacheCampMenuMain();
+
             List<List<GameObject>> itemButtons = new List<List<GameObject>>();
             GameObject curOneLineObj = null;
             int curAddedCount = 0;
@@ -70,7 +123,7 @@ namespace RF5.HisaCat.AllItemsHere.Components
                 if (CheckIsValidItemId(itemId) == false)
                     continue;
 
-                //if (curAddedCount >= 4) break;
+                if (curAddedCount >= 10) break;
 
                 var dataTable = ItemDataTable.GetDataTable(itemId);
 
@@ -82,32 +135,15 @@ namespace RF5.HisaCat.AllItemsHere.Components
                     curX = 0; curY++;
                 }
 
-                //ItemIconLoader.instan
-                //dataTable.IconName
                 var curItemSlot = Instantiate(this.Prefab_ItemsSlot, curOneLineObj.transform);
                 curItemSlot.name = $"{this.Prefab_ItemsSlot} {curAddedCount}";
                 var itemIconLoader = curItemSlot.AddComponent<ItemIconLoader>();
                 itemIconLoader.Image = curItemSlot.transform.Find("Image_Item").GetComponent<Image>();
                 itemIconLoader.SetLoadIcon(itemId);
 
-                //UIScrollBox
-                //UIShipmentItemButton ss = null;
-                //ss.ItemID = ItemID.ITEM_EMPTY;
-                //ss.SlotNo = 0;
-                //ss.ButtonWork = null;
-                //ss.BackLink = null;
-
-                var buttonLinker = curItemSlot.AddComponent<SimpleButtonLinker>();
-                linkers.Add(buttonLinker);
-                //buttonLinker.uiscrollbox
-                //buttonLinker.ButtonWork = null;
-                //buttonLinker.BackLink = null;
-                //buttonLinker.LinkObjectList = new Il2CppSystem.Collections.Generic.List<ButtonLinker.LinkObject>();
-                //buttonLinker.rect = buttonLinker.transform as RectTransform;
-                //buttonLinker.ButtonGuideId = Define.ButtonGuideId.calendar;
-                //buttonLinker.ItemSlot = null;
-                //buttonLinker.ButtonWork = null;
-                //buttonLinker.ButtonGuideId = Define.ButtonGuideId.calendar;
+                var buttonLinker = curItemSlot.AddComponent<ButtonLinker>();
+                //Enable- touch
+                buttonLinker.TouchSelector = true;
 
                 curX++;
                 curAddedCount++;
@@ -203,7 +239,7 @@ namespace RF5.HisaCat.AllItemsHere.Components
                 return false;
             }
 
-            BepInExLog.Log("InstantiateAndAttach: Success: AllItemsHereWindow Attacked!");
+            BepInExLog.Log("InstantiateAndAttach: Success: AllItemsHereWindow Attached!");
             return true;
         }
     }
