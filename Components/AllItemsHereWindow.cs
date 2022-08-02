@@ -117,7 +117,7 @@ namespace RF5.HisaCat.AllItemsHere.Components
             {
                 GameObject curOneLineObj = null;
                 int curAddedCount = 0;
-                var curXY = new Vector2Int(-1, -1);
+                var curXY = new Vector2Int(0, -1);
                 foreach (ItemID itemId in typeof(ItemID).GetEnumValues())
                 {
                     if (CheckIsValidItemId(itemId) == false)
@@ -186,7 +186,7 @@ namespace RF5.HisaCat.AllItemsHere.Components
 
                 //Linkers for escape
                 var rightEdgeLinkers = buttonLinkersMap.Where(x => x.Key.y >= ONE_LINE_COUNT).Select(x => x.Value);
-                foreach(var linker in rightEdgeLinkers)
+                foreach (var linker in rightEdgeLinkers)
                 {
                     //TODO: Add escape link.
                     //linker.AddLink(CursorLinker.InputMoveType.Right, null);
