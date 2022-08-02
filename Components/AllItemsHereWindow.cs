@@ -123,7 +123,7 @@ namespace RF5.HisaCat.AllItemsHere.Components
                     if (CheckIsValidItemId(itemId) == false)
                         continue;
 
-                    if (curAddedCount >= 10) break;
+                    if (curAddedCount >= 50) break;
 
                     var dataTable = ItemDataTable.GetDataTable(itemId);
 
@@ -167,8 +167,8 @@ namespace RF5.HisaCat.AllItemsHere.Components
 
                     var leftXY = new Vector2Int(curXY.x - 1, curXY.y);
                     var rightXY = new Vector2Int(curXY.x + 1, curXY.y);
-                    var upXY = new Vector2Int(curXY.x, curXY.y + 1);
-                    var downXY = new Vector2Int(curXY.x, curXY.y - 1);
+                    var upXY = new Vector2Int(curXY.x, curXY.y - 1);
+                    var downXY = new Vector2Int(curXY.x, curXY.y + 1);
 
                     if (buttonLinkersMap.ContainsKey(leftXY))
                         curLinker.AddLink(CursorLinker.InputMoveType.Left, buttonLinkersMap[leftXY].gameObject);
@@ -181,7 +181,10 @@ namespace RF5.HisaCat.AllItemsHere.Components
 
                     curXY.x++;
                     if (curXY.x >= ONE_LINE_COUNT)
+                    {
+                        curXY.x = 0;
                         curXY.y++;
+                    }
                 }
 
                 //Linkers for escape
