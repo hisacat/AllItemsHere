@@ -48,6 +48,7 @@ namespace RF5.HisaCat.AllItemsHere
                 Harmony.CreateAndPatchAll(typeof(Utils.RF5FontHelper.FontLoader));
                 Harmony.CreateAndPatchAll(typeof(Patches.ModInitializePatch));
                 Harmony.CreateAndPatchAll(typeof(Patches.WindowAttachPatch));
+                Harmony.CreateAndPatchAll(typeof(Patches.CampMenuPatch));
             }
             catch (System.Exception e)
             {
