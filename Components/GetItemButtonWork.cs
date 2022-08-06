@@ -13,6 +13,9 @@ namespace RF5.HisaCat.AllItemsHere.Components
         public override void ButtonWork(Key btnType)
         {
             BepInExLog.Log($"{name} ButtonWork {btnType}");
+            
+            //Give item like this.
+            //ItemStorageManager.GetStorage(Define.StorageType.Rucksack).PushItemIn(ItemData.Instantiate(ItemID.Item_Aianejji, 1));
         }
 
         public override void OnFocus()
